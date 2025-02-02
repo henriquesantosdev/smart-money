@@ -10,12 +10,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  active    Boolean  @default(true)
+model Users {
+  id            String          @id @default(uuid())
+  first_name    String
+  last_name     String
+  email         String          @unique
+  password_hash String
+  created_at    DateTime        @default(now())
+  active        Boolean         @default(true)
+  bank_accounts Bank_accounts[]
+}
+
+model Bank_accounts {
+  id           String       @id @default(uuid())
+  bank_name    String
+  balance      Int          @default(0)
+  currency     String
+  account_type Account_type
+  user_id      String
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+
+  user Users @relation(fields: [user_id], references: [id])
+}
+
+enum Account_type {
+  Checking
+  Savings
+  Salary
+  Investment
+  Digital
+  Joint
+  Business
+  Payment
 }

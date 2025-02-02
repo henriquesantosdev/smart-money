@@ -35,12 +35,12 @@ export class UserController {
     return this.userService.updateUser(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   softDeleteUser(@Param('id') id: string) {
     return this.userService.softDeleteUser(id);
   }
 
-  @Patch('activate/:id')
+  @Patch('active/:id')
   activateUser(@Param('id') id: string) {
     return this.userService.activeUser(id);
   }

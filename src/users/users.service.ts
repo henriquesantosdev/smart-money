@@ -8,14 +8,21 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async findAllUsers() {
-    const users = await this.prisma.user.findMany();
+    const users = await this.prisma.users.findMany({
+      include: {
+        bank_accounts: true,
+      },
+    });
     return users;
   }
 
   async findUser(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         id: id,
+      },
+      include: {
+        bank_accounts: true,
       },
     });
 
@@ -27,18 +34,18 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.prisma.user.create({
+    const user = await this.prisma.users.create({
       data: {
-        firstName: createUserDto.firstName,
-        lastName: createUserDto.lastName,
+        first_name: createUserDto.first_name,
+        last_name: createUserDto.last_name,
         email: createUserDto.email,
-        password: createUserDto.password,
+        password_hash: createUserDto.password_hash,
       },
       select: {
-        firstName: true,
-        lastName: true,
+        first_name: true,
+        last_name: true,
         email: true,
-        createdAt: true,
+        created_at: true,
       },
     });
 
@@ -55,7 +62,7 @@ export class UserService {
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     console.log(id, updateUserDto);
 
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         id: id,
       },
@@ -67,21 +74,21 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const updated = await this.prisma.user.update({
+    const updated = await this.prisma.users.update({
       data: {
-        firstName: updateUserDto.firstName,
-        lastName: updateUserDto.lastName,
+        first_name: updateUserDto.first_name,
+        last_name: updateUserDto.last_name,
         email: updateUserDto.email,
-        password: updateUserDto.password,
+        password_hash: updateUserDto.password_hash,
       },
       where: {
         id,
       },
       select: {
-        firstName: true,
-        lastName: true,
+        first_name: true,
+        last_name: true,
         email: true,
-        password: true,
+        password_hash: true,
       },
     });
 
@@ -96,7 +103,7 @@ export class UserService {
   }
 
   async softDeleteUser(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         id,
       },
@@ -106,7 +113,7 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const deleted = await this.prisma.user.update({
+    const deleted = await this.prisma.users.update({
       data: {
         active: false,
       },
@@ -126,7 +133,7 @@ export class UserService {
   }
 
   async activeUser(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         id,
       },
@@ -136,7 +143,7 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const activated = await this.prisma.user.update({
+    const activated = await this.prisma.users.update({
       data: {
         active: true,
       },
