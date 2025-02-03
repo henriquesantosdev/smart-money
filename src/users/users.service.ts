@@ -2,10 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { UpdateUserDto } from './dto/Update-user.dto';
+import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private hashingService: HashingServiceProtocol,
+  ) {}
 
   async findAllUsers() {
     const users = await this.prisma.users.findMany({
@@ -34,12 +38,15 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
+    console.log(createUserDto);
+    const passwordHash = await this.hashingService.hash(createUserDto.password);
+
     const user = await this.prisma.users.create({
       data: {
         first_name: createUserDto.first_name,
         last_name: createUserDto.last_name,
         email: createUserDto.email,
-        password_hash: createUserDto.password_hash,
+        password_hash: passwordHash,
       },
       select: {
         first_name: true,
@@ -60,26 +67,24 @@ export class UserService {
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
-    console.log(id, updateUserDto);
-
     const user = await this.prisma.users.findUnique({
       where: {
         id: id,
       },
     });
 
-    console.log(user);
-
     if (!user) {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+
+    const passwordHash = await this.hashingService.hash(updateUserDto.password);
 
     const updated = await this.prisma.users.update({
       data: {
         first_name: updateUserDto.first_name,
         last_name: updateUserDto.last_name,
         email: updateUserDto.email,
-        password_hash: updateUserDto.password_hash,
+        password_hash: passwordHash,
       },
       where: {
         id,
@@ -88,7 +93,6 @@ export class UserService {
         first_name: true,
         last_name: true,
         email: true,
-        password_hash: true,
       },
     });
 

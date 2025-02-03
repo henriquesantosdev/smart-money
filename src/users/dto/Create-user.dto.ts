@@ -9,5 +9,5 @@ export class CreateUserDto {
   email: string;
   @IsNotEmpty()
   @Min(6)
-  password_hash: string;
+  password: string;
 }
