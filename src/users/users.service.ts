@@ -13,7 +13,7 @@ export class UserService {
   ) {}
 
   async findAllUsers() {
-    const users = await this.prisma.users.findMany({
+    const users = await this.prisma.user.findMany({
       where: {
         active: true,
       },
@@ -25,7 +25,7 @@ export class UserService {
   }
 
   async findUser(tokenPayloadDto: TokenPayloadDto) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: tokenPayloadDto.sub,
         active: true,
@@ -46,7 +46,7 @@ export class UserService {
     console.log(createUserDto);
     const passwordHash = await this.hashingService.hash(createUserDto.password);
 
-    const user = await this.prisma.users.create({
+    const user = await this.prisma.user.create({
       data: {
         first_name: createUserDto.first_name,
         last_name: createUserDto.last_name,
@@ -75,7 +75,7 @@ export class UserService {
     updateUserDto: UpdateUserDto,
     tokenPayloadDto: TokenPayloadDto,
   ) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: tokenPayloadDto.sub,
         active: true,
@@ -94,7 +94,7 @@ export class UserService {
       ? await this.hashingService.hash(updateUserDto.password)
       : user.password_hash;
 
-    const updated = await this.prisma.users.update({
+    const updated = await this.prisma.user.update({
       data: {
         first_name: updateUserDto.first_name || user.first_name,
         last_name: updateUserDto.last_name || user.last_name,
@@ -122,7 +122,7 @@ export class UserService {
   }
 
   async softDeleteUser(tokenPayloadDto: TokenPayloadDto) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: tokenPayloadDto.sub,
         active: true,
@@ -137,7 +137,7 @@ export class UserService {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    const deleted = await this.prisma.users.update({
+    const deleted = await this.prisma.user.update({
       data: {
         active: false,
       },
@@ -157,7 +157,7 @@ export class UserService {
   }
 
   async activeUser(id: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
         active: false,
@@ -168,7 +168,7 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const activated = await this.prisma.users.update({
+    const activated = await this.prisma.user.update({
       data: {
         active: true,
       },

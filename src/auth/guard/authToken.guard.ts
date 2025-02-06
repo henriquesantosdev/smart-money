@@ -65,5 +65,3 @@ export class AuthTokenGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
-
-// middleware -> guard -> interceptor -> controller -> service

@@ -12,7 +12,7 @@ export class BankAccountsService {
     tokenPayloadDto: TokenPayloadDto,
   ) {
     try {
-      const account = await this.prisma.bank_accounts.create({
+      const account = await this.prisma.bank_account.create({
         data: {
           user_id: tokenPayloadDto.sub,
           bank_name: createBankAccountDto.bank_name,

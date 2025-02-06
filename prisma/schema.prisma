@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model User {
   id            String          @id @default(uuid())
   first_name    String
   last_name     String
@@ -18,10 +18,10 @@ model Users {
   password_hash String
   created_at    DateTime        @default(now())
   active        Boolean         @default(true)
-  bank_accounts Bank_accounts[]
+  bank_accounts Bank_account[]
 }
 
-model Bank_accounts {
+model Bank_account {
   id           String       @id @default(uuid())
   bank_name    String
   balance      Int          @default(0)
@@ -31,7 +31,7 @@ model Bank_accounts {
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
 
-  user Users @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
 
 enum Account_type {
