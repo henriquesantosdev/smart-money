@@ -10,6 +10,9 @@ import {
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { UpdateUserDto } from './dto/Update-user.dto';
+import { TokenPayloadParam } from 'src/auth/param/token-payload.param';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { Public } from 'src/auth/guard/isPublic';
 
 @Controller('user')
 export class UserController {
@@ -20,27 +23,32 @@ export class UserController {
     return this.userService.findAllUsers();
   }
 
-  @Get(':id')
-  findUser(@Param('id') id: string) {
-    return this.userService.findUser(id);
+  @Get()
+  findUser(@TokenPayloadParam() tokenPayload: TokenPayloadDto) {
+    return this.userService.findUser(tokenPayload);
   }
 
+  @Public()
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
   }
 
-  @Patch(':id')
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.updateUser(id, updateUserDto);
+  @Patch()
+  updateUser(
+    @Body() updateUserDto: UpdateUserDto,
+    @TokenPayloadParam() tokenPayload: TokenPayloadDto,
+  ) {
+    console.log(tokenPayload);
+    return this.userService.updateUser(updateUserDto, tokenPayload);
   }
 
-  @Delete('delete/:id')
-  softDeleteUser(@Param('id') id: string) {
-    return this.userService.softDeleteUser(id);
+  @Delete('/delete')
+  softDeleteUser(@TokenPayloadParam() tokenPayloadDto: TokenPayloadDto) {
+    return this.userService.softDeleteUser(tokenPayloadDto);
   }
 
-  @Patch('active/:id')
+  @Patch('/active/:id')
   activateUser(@Param('id') id: string) {
     return this.userService.activeUser(id);
   }

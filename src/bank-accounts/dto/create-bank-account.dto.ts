@@ -3,8 +3,6 @@ import { AccountType } from '../@types/account-type';
 
 export class CreateBankAccountDto {
   @IsString()
-  user_id: string;
-  @IsString()
   bank_name: string;
   @IsInt()
   balance?: number;

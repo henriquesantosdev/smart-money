@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { UpdateUserDto } from './dto/Update-user.dto';
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,9 @@ export class UserService {
 
   async findAllUsers() {
     const users = await this.prisma.users.findMany({
+      where: {
+        active: true,
+      },
       include: {
         bank_accounts: true,
       },
@@ -20,10 +24,11 @@ export class UserService {
     return users;
   }
 
-  async findUser(id: string) {
+  async findUser(tokenPayloadDto: TokenPayloadDto) {
     const user = await this.prisma.users.findUnique({
       where: {
-        id: id,
+        id: tokenPayloadDto.sub,
+        active: true,
       },
       include: {
         bank_accounts: true,
@@ -66,10 +71,14 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(
+    updateUserDto: UpdateUserDto,
+    tokenPayloadDto: TokenPayloadDto,
+  ) {
     const user = await this.prisma.users.findUnique({
       where: {
-        id: id,
+        id: tokenPayloadDto.sub,
+        active: true,
       },
     });
 
@@ -77,17 +86,23 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const passwordHash = await this.hashingService.hash(updateUserDto.password);
+    if (user.id !== tokenPayloadDto.sub) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    const passwordHash = updateUserDto.password
+      ? await this.hashingService.hash(updateUserDto.password)
+      : user.password_hash;
 
     const updated = await this.prisma.users.update({
       data: {
-        first_name: updateUserDto.first_name,
-        last_name: updateUserDto.last_name,
-        email: updateUserDto.email,
+        first_name: updateUserDto.first_name || user.first_name,
+        last_name: updateUserDto.last_name || user.last_name,
+        email: updateUserDto.email || user.email,
         password_hash: passwordHash,
       },
       where: {
-        id,
+        id: tokenPayloadDto.sub,
       },
       select: {
         first_name: true,
@@ -106,10 +121,11 @@ export class UserService {
     return updated;
   }
 
-  async softDeleteUser(id: string) {
+  async softDeleteUser(tokenPayloadDto: TokenPayloadDto) {
     const user = await this.prisma.users.findUnique({
       where: {
-        id,
+        id: tokenPayloadDto.sub,
+        active: true,
       },
     });
 
@@ -117,12 +133,16 @@ export class UserService {
       return new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
+    if (user.id !== tokenPayloadDto.sub) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
     const deleted = await this.prisma.users.update({
       data: {
         active: false,
       },
       where: {
-        id,
+        id: tokenPayloadDto.sub,
       },
     });
 
@@ -140,6 +160,7 @@ export class UserService {
     const user = await this.prisma.users.findUnique({
       where: {
         id,
+        active: false,
       },
     });
 
