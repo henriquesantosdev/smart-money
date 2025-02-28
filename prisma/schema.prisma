@@ -11,13 +11,13 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(uuid())
+  id            String         @id @default(uuid())
   first_name    String
   last_name     String
-  email         String          @unique
+  email         String         @unique
   password_hash String
-  created_at    DateTime        @default(now())
-  active        Boolean         @default(true)
+  created_at    DateTime       @default(now())
+  active        Boolean        @default(true)
   bank_accounts Bank_account[]
 }
 
@@ -31,7 +31,20 @@ model Bank_account {
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
 
-  user User @relation(fields: [user_id], references: [id])
+  user        User          @relation(fields: [user_id], references: [id])
+  Credit_card Credit_card[]
+}
+
+model Credit_card {
+  id              String     @id @default(uuid())
+  name            String
+  brand           Card_brand
+  avaliable_limit Decimal
+  due_day         Int
+  closing_day     Int
+  bank_account_id String
+
+  bank_account Bank_account @relation(fields: [bank_account_id], references: [id])
 }
 
 enum Account_type {
@@ -43,4 +56,13 @@ enum Account_type {
   Joint
   Business
   Payment
+}
+
+enum Card_brand {
+  Visa
+  MasterCard
+  Elo
+  Amex
+  Hipercard
+  Other
 }
