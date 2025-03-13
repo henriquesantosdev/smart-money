@@ -10,15 +10,15 @@ import { SalaryCommitment } from "@/components/charts/salary-commitment"
 import { Button } from "@/components/ui/button"
 
 import { useEffect } from "react"
-import { signin, signout } from "@/redux/user/slice"
+import { signup } from "@/redux/user/slice"
 import { useAppDispatch } from "@/redux/hooks/redux-hook"
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(signin())
-    dispatch(signout())
+    dispatch(signup())
+    // dispatch(signout())
   })
 
   return (

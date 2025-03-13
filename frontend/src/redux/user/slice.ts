@@ -1,11 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 interface initialStateInterface {
-  user: null
+  user: unknown,
+  loading: boolean
 }
 
 const initialState: initialStateInterface = {
-  user: null
+  user: null,
+  loading: false
 }
 
 export const userSlice = createSlice({
@@ -13,18 +15,38 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     signin: () => {
-      console.log('Passou no userSlice signin')
+    },
+    
+    signinSuccess: () => {
+    },
+    
+    signinFailure: () => {
+    },
+    
+    signup: (state) => {
+      state.loading = true
+    },
+    
+    signupSuccess: (state, action) => {
+      state.user = action.payload
+      state.loading = false
+    },
+
+    signupFailure: (state, action) => {
+      alert(action.payload)
+      state.loading = false
     },
 
     signout: () => {
-      console.log('Passou no userSlice signout')
+      // console.log('Passou no userSlice signout')
     }
   }
 })
 
 export const {
   signin,
-  signout
+  signout,
+  signup
 } = userSlice.actions
 
 export default userSlice.reducer
