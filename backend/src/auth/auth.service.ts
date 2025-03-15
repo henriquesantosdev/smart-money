@@ -25,7 +25,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new HttpException('User not exists', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        {
+          message: 'User not exists',
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const passwordIsValid = this.hashingService.compare(

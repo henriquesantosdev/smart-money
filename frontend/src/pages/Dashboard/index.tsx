@@ -8,27 +8,20 @@ import { IncomeChart } from "@/components/charts/income-chart"
 import { ExpensesChart } from "@/components/charts/expenses-chart"
 import { SalaryCommitment } from "@/components/charts/salary-commitment"
 import { Button } from "@/components/ui/button"
-
-import { useEffect } from "react"
-import { signup } from "@/redux/user/slice"
-import { useAppDispatch } from "@/redux/hooks/redux-hook"
+import { useAppSelector } from "@/redux/hooks/redux-hook"
+import { initialStateInterface } from "@/redux/user/slice"
 
 export const Dashboard = () => {
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(signup())
-    // dispatch(signout())
-  })
-
+  const { user }: initialStateInterface = useAppSelector(rootReducer => rootReducer.user)
+  
   return (
     <SidebarProvider>
       <AppSidebar />
       <main className="bg-black-1050 w-full p-6">
         <SidebarTrigger className="bg-gray-200 text-black-950 mb-4" size='lg' />
 
+          {user?.email}
         <section className="grid grid-cols-3 gap-4">
-
           <div className="flex gap-8 bg-black-1000 border-[1px] border-black-900 rounded-md p-4">
             <div className="text-white w-6/12 flex flex-col gap-1 justify-center">
               <h3 className="text-2xl font-semibold">Total in account</h3>

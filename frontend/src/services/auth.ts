@@ -1,6 +1,10 @@
 const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY 
 
-export const isAuthenticated = () => localStorage.getItem(TOKEN_KEY) != null
+export const isAuthenticated = () => {
+  const token = localStorage.getItem(TOKEN_KEY) != null
+
+  return token
+}
 
 export const getToken = (): string | null => {
   const token = localStorage.getItem(TOKEN_KEY)
